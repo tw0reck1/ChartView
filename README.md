@@ -23,6 +23,7 @@ Setup code:
         val pieChartView = findViewById(R.id.piechart)
         pieChartView.showChart(data, colors, AnimationType.ONE_BY_ONE, 1500)
     }
+...
 ```
 ### Pie chart samples
-![PieSamples](pie_sample.png)
+![PieSamples](pie_sample.gif)
