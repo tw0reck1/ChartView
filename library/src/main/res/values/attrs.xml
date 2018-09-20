@@ -4,6 +4,7 @@
     <declare-styleable name="PieChartView">
         <attr name="pcv_border_width" format="dimension"/>
         <attr name="pcv_border_color" format="color"/>
+        <attr name="pcv_donut_ratio" format="float"/>
         <attr name="pcv_animation_type">
             <flag name="none" value="0" />
             <flag name="all_at_once" value="1" />

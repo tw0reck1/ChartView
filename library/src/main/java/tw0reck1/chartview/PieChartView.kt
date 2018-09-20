@@ -31,6 +31,8 @@ open class PieChartView : View {
         const val DEFAULT_BORDER_WIDTH = 1f
         const val DEFAULT_BORDER_COLOR = Color.BLACK
 
+        const val DEFAULT_DONUT_RATIO = 0f
+
         const val DEFAULT_ANIMATION_TYPE = AnimationType.ALL_AT_ONCE
         const val DEFAULT_ANIMATION_DURATION = 1000
 
@@ -46,6 +48,8 @@ open class PieChartView : View {
     private var borderWidth = UNSET_SIZE
     private var borderColor = DEFAULT_BORDER_COLOR
 
+    private var donutRatio = DEFAULT_DONUT_RATIO
+
     private var animationType = DEFAULT_ANIMATION_TYPE
     private var animationDuration = DEFAULT_ANIMATION_DURATION
 
@@ -54,6 +58,8 @@ open class PieChartView : View {
 
     private var chartAngle = 360f
     private val chartRect = RectF()
+    private var donutRect: RectF? = null
+    private var donutPorterMode = PorterDuffXfermode(PorterDuff.Mode.DST_OUT)
 
     private var chartAnimator: ValueAnimator? = null
     private val chartAnimatorListener: Animator.AnimatorListener by lazy {
@@ -86,6 +92,8 @@ open class PieChartView : View {
                 dpToPx(context, DEFAULT_BORDER_WIDTH))
         borderColor = array.getColor(R.styleable.PieChartView_pcv_border_color, DEFAULT_BORDER_COLOR)
 
+        donutRatio = array.getFloat(R.styleable.PieChartView_pcv_donut_ratio, DEFAULT_DONUT_RATIO)
+
         animationType = array.getInteger(R.styleable.PieChartView_pcv_animation_type,
                 DEFAULT_ANIMATION_TYPE)
         animationDuration = array.getInteger(R.styleable.PieChartView_pcv_animation_duration,
@@ -102,6 +110,10 @@ open class PieChartView : View {
         borderPaint.strokeJoin = Paint.Join.ROUND
         borderPaint.strokeWidth = borderWidth
         borderPaint.color = borderColor
+
+        if (donutRatio < 0f || donutRatio >= 1f) {
+            throw IllegalArgumentException("Donut ratio ($donutRatio) is not in the supported range: [0, 1).")
+        }
     }
 
     fun showChart(data: Array<Float>, colors: Array<Int>, type: Int = animationType,
@@ -162,18 +174,28 @@ open class PieChartView : View {
         val width =  w - paddingRight - paddingLeft
         val height =  h - paddingBottom - paddingTop
 
-        val radius = Math.min(width, height) / 2f
-
         val centerX = paddingLeft + width / 2f
         val centerY = paddingTop + height / 2f
 
-        val left = centerX - radius
-        val right = centerX + radius
+        var radius = Math.min(width, height) / 2f
 
-        val top = centerY - radius
-        val bottom = centerY + radius
+        var left = centerX - radius
+        var right = centerX + radius
+        var top = centerY - radius
+        var bottom = centerY + radius
 
         chartRect.set(left, top, right, bottom)
+
+        if (donutRatio > 0f) {
+            radius *= donutRatio
+
+            left = centerX - radius
+            right = centerX + radius
+            top = centerY - radius
+            bottom = centerY + radius
+
+            donutRect = RectF(left, top, right, bottom)
+        }
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -231,6 +253,20 @@ open class PieChartView : View {
                 angle += sweep
                 availableSweep -= sweep
             }
+        }
+
+        donutRect?.let {
+            val donutSize = if (borderWidth > 0f) {
+                canvas.drawArc(it, -90f, angle + 90f, true, borderPaint)
+
+                it.width() / 2f - borderWidth / 2f
+            } else {
+                it.width() / 2f
+            }
+
+            chartPaint.xfermode = donutPorterMode
+            canvas.drawCircle(it.centerX(), it.centerY(), donutSize, chartPaint)
+            chartPaint.xfermode = null
         }
     }
 
