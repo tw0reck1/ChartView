@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="PieChartView">
+        <attr name="pcv_border_width" format="dimension"/>
+        <attr name="pcv_border_color" format="color"/>
+        <attr name="pcv_animation_type">
+            <flag name="none" value="0" />
+            <flag name="all_at_once" value="1" />
+            <flag name="one_by_one" value="2" />
+        </attr>
+        <attr name="pcv_animation_duration" format="integer"/>
+    </declare-styleable>
+
+</resources>
