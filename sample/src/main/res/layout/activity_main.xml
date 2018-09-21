@@ -13,32 +13,32 @@
         android:id="@+id/piechart1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="1"
         android:padding="4dp"
         app:pcv_border_width="2dp"
         app:pcv_donut_ratio="0.75"
         app:pcv_animation_type="one_by_one"/>
 
-    <tw0reck1.chartview.PieChartView
-        android:id="@+id/piechart2"
+    <tw0reck1.chartview.BarChartView
+        android:id="@+id/barchart1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
         android:layout_marginTop="16dp"
-        android:padding="4dp"
-        app:pcv_border_width="1dp"
-        app:pcv_donut_ratio="0.5"
-        app:pcv_animation_type="all_at_once"
-        app:pcv_animation_duration="1500"/>
+        app:bcv_border_width="1dp"
+        app:bcv_borders="all"
+        app:bcv_indicator_step="50"
+        app:bcv_max_value="250"/>
 
     <tw0reck1.chartview.PieChartView
-        android:id="@+id/piechart3"
+        android:id="@+id/piechart2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="16dp"
         android:padding="4dp"
-        app:pcv_border_width="0dp"
-        app:pcv_animation_type="none"/>
+        app:pcv_border_width="1dp"
+        app:pcv_animation_type="all_at_once"
+        app:pcv_animation_duration="1500"/>
 
 </LinearLayout>
