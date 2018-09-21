@@ -1,5 +1,5 @@
 # ChartView
-Android View for displaying charts. PieChartView can be adjusted by using custom XML attributes. These attributes include border size and color, donut size and reveal animation settings.
+Android View for displaying charts. There are two views available at the moment: PieChartView and BarChartView. Both of them can be adjusted by using custom XML attributes. These attributes include border size and color, reveal animation settings and more.
 ### Usage
 Declaring view in layout:
 ```xml
@@ -27,3 +27,5 @@ Setup code:
 ```
 ### Pie chart samples
 ![PieSamples](pie_sample.gif)
+### Bar chart samples
+![BarSamples](bar_sample.gif)
