@@ -230,14 +230,14 @@ open class BarChartView : View {
             linePaint.color = indicatorColor
 
             val lines = (maxValue / indicatorStep.toFloat()).toInt()
-            val startHeight = paddingTop + height.toFloat()
-            val spacing = height.toFloat() / (maxValue.toFloat() / indicatorStep)
+            val startHeight = bitmapHeight.toFloat()
+            val spacing = bitmapHeight.toFloat() / (maxValue.toFloat() / indicatorStep)
 
             var lineHeight: Float
             for (i in 1..lines) {
                 lineHeight = startHeight - i * spacing
 
-                canvas.drawLine(paddingLeft.toFloat(), lineHeight, (paddingLeft + width).toFloat(),
+                canvas.drawLine(0f, lineHeight, bitmapWidth.toFloat(),
                         lineHeight, linePaint)
             }
         }
@@ -246,10 +246,10 @@ open class BarChartView : View {
             linePaint.strokeWidth = borderWidth
             linePaint.color = borderColor
 
-            val left = paddingLeft.toFloat() + borderWidth / 2f
-            val top = paddingTop.toFloat() + borderWidth / 2f
-            val right = paddingLeft.toFloat() + width - borderWidth / 2f
-            val bottom = paddingTop.toFloat() + height - borderWidth / 2f
+            val left = borderWidth / 2f
+            val top = borderWidth / 2f
+            val right = bitmapWidth - borderWidth / 2f
+            val bottom = bitmapHeight - borderWidth / 2f
 
             if (borders and Border.LEFT == Border.LEFT) {
                 canvas.drawLine(left, top, left, bottom, linePaint)
