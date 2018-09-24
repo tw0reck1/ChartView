@@ -30,6 +30,7 @@
         <attr name="bcv_indicator_width" format="dimension"/>
         <attr name="bcv_indicator_color" format="color"/>
         <attr name="bcv_indicator_step" format="integer"/>
+        <attr name="bcv_indicator_label_format" format="string"/>
         <attr name="bcv_max_value" format="integer"/>
         <attr name="bcv_animation_type">
             <flag name="none" value="0" />

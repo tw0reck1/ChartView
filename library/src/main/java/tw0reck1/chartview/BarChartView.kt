@@ -48,6 +48,7 @@ open class BarChartView : View {
         const val DEFAULT_INDICATOR_WIDTH = 1f
         const val DEFAULT_INDICATOR_COLOR = Color.LTGRAY
         const val DEFAULT_INDICATOR_STEP = 25
+        val DEFAULT_INDICATOR_LABEL_FORMAT: String? = null
 
         const val DEFAULT_MAX_VALUE = 100
 
@@ -74,6 +75,7 @@ open class BarChartView : View {
     private var indicatorWidth = UNSET_SIZE
     private var indicatorColor = DEFAULT_INDICATOR_COLOR
     private var indicatorStep = DEFAULT_INDICATOR_STEP
+    private var indicatorLabelFormat = DEFAULT_INDICATOR_LABEL_FORMAT
 
     private var maxValue = DEFAULT_MAX_VALUE
 
@@ -87,6 +89,7 @@ open class BarChartView : View {
 
     private val barRect = RectF()
     private val boundingRect = RectF()
+    private var labelMargin = 0f
     private var chartBitmap: Bitmap? = null
 
     private var chartAnimator: ValueAnimator? = null
@@ -134,6 +137,8 @@ open class BarChartView : View {
                 DEFAULT_INDICATOR_COLOR)
         indicatorStep = array.getInteger(R.styleable.BarChartView_bcv_indicator_step,
                 DEFAULT_INDICATOR_STEP)
+        indicatorLabelFormat = array.getString(R.styleable.BarChartView_bcv_indicator_label_format)
+                ?: DEFAULT_INDICATOR_LABEL_FORMAT
 
         maxValue = array.getInteger(R.styleable.BarChartView_bcv_max_value, DEFAULT_MAX_VALUE)
 
@@ -223,9 +228,9 @@ open class BarChartView : View {
 
         val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         linePaint.style = Paint.Style.STROKE
-        linePaint.strokeCap = Paint.Cap.SQUARE
 
         if (indicatorWidth > 0f && indicatorStep > 0) {
+            linePaint.strokeCap = Paint.Cap.BUTT
             linePaint.strokeWidth = indicatorWidth
             linePaint.color = indicatorColor
 
@@ -234,19 +239,56 @@ open class BarChartView : View {
             val spacing = bitmapHeight.toFloat() / (maxValue.toFloat() / indicatorStep)
 
             var lineHeight: Float
-            for (i in 1..lines) {
-                lineHeight = startHeight - i * spacing
 
-                canvas.drawLine(0f, lineHeight, bitmapWidth.toFloat(),
-                        lineHeight, linePaint)
+            if (indicatorLabelFormat != null) {
+                val longestText = String.format(indicatorLabelFormat!!, maxValue)
+                val textBounds = Rect()
+
+                val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+                textPaint.textSize = indicatorWidth * 12f
+                textPaint.color = borderColor
+                textPaint.textAlign = Paint.Align.RIGHT
+                textPaint.getTextBounds(longestText, 0, longestText.length, textBounds)
+
+                val textWidth = textBounds.width().toFloat()
+                val margin = textBounds.height() / 4f
+
+                labelMargin = textWidth + margin
+
+                val textMinY = textBounds.height().toFloat()
+                val textMaxY = bitmapHeight.toFloat()
+                var textY: Float
+
+                for (i in 0..lines) {
+                    lineHeight = startHeight - i * spacing
+
+                    textY = Math.min(textMaxY, Math.max(lineHeight - textBounds.exactCenterY(),
+                            textMinY))
+
+                    canvas.drawText(String.format(indicatorLabelFormat!!, indicatorStep * i),
+                            textWidth, textY, textPaint)
+
+                    if (i == 0) continue
+
+                    canvas.drawLine(labelMargin, lineHeight, bitmapWidth.toFloat(),
+                            lineHeight, linePaint)
+                }
+            } else {
+                for (i in 1..lines) {
+                    lineHeight = startHeight - i * spacing
+
+                    canvas.drawLine(0f, lineHeight, bitmapWidth.toFloat(),
+                            lineHeight, linePaint)
+                }
             }
         }
 
         if (borderWidth > 0f) {
+            linePaint.strokeCap = Paint.Cap.SQUARE
             linePaint.strokeWidth = borderWidth
             linePaint.color = borderColor
 
-            val left = borderWidth / 2f
+            val left = labelMargin + borderWidth / 2f
             val top = borderWidth / 2f
             val right = bitmapWidth - borderWidth / 2f
             val bottom = bitmapHeight - borderWidth / 2f
@@ -272,7 +314,7 @@ open class BarChartView : View {
     }
 
     private fun adjustBoundingRect(rectF: RectF) {
-        var left = paddingLeft.toFloat()
+        var left = paddingLeft.toFloat() + labelMargin
         var top = paddingTop.toFloat()
         var right = (width - paddingRight).toFloat()
         var bottom = (height - paddingBottom).toFloat()
@@ -307,7 +349,7 @@ open class BarChartView : View {
         var columnHeight: Float
         val maxColumnHeight = boundingRect.height()
 
-        var left = paddingLeft.toFloat() + columnWidth
+        var left = boundingRect.left + columnWidth
 
         if (animationType == AnimationType.NONE) {
             for (a in 0..count - 1) {
