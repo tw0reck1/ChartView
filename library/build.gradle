@@ -27,3 +27,7 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+if (file("./deploy.gradle").exists()) {
+    apply from: './deploy.gradle'
+}
